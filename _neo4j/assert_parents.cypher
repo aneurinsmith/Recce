@@ -1,0 +1,1 @@
+MATCH ()<-[:CHILD_OF]-(s:Stop)-[:CHILD_OF]->() RETURN s
