@@ -1,1 +1,1 @@
-MATCH ()<-[:CHILD_OF]-(s:Stop)-[:CHILD_OF]->() RETURN s
+MATCH (s:Stop)-[r:CHILD_OF]->() WITH s, count(r) AS pc WHERE pc > 1 RETURN s
