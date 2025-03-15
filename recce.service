@@ -1,0 +1,15 @@
+[Unit]
+Description=Recce as a NodeJS service
+After=network.target
+
+[Service]
+ExecStart=/usr/local/bin/nodemon /var/dav/projects/recce/server.js
+Restart=always
+User=nobody
+Group=nogroup
+Environment=PATH=/usr/bin:/usr/local/bin
+Environment=NODE_ENV=production
+WorkingDirectory=/var/dav/projects/recce
+
+[Install]
+WantedBy=multi-user.target
