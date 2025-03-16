@@ -40,17 +40,26 @@ while true; do
     fi
 done
 
-# Ensure neo4j indexes exist
 echo -e "[ETL] Ensuring neo4j constraints..."
 cypher-shell -a bolt+s://neo4j.aneur.info -u $username -p $password --format verbose < "_neo4j/create_index.cypher" | 
     grep -E 'Added|Created|Set|Deleted' | awk '{print "[ETL] -- " $0}'
 
-# Insert and update stops
+
+
+echo -e "[ETL] Loading and updating agencies"
+cypher-shell -a bolt+s://neo4j.aneur.info -u $username -p $password --format verbose < "_neo4j/load_agencies.cypher" | 
+    grep -E 'Added|Created|Set|Deleted' | awk '{print "[ETL] -- " $0}'
+
+echo -e "[ETL] Loading and updating routes"
+cypher-shell -a bolt+s://neo4j.aneur.info -u $username -p $password --format verbose < "_neo4j/load_routes.cypher" | 
+    grep -E 'Added|Created|Set|Deleted' | awk '{print "[ETL] -- " $0}'
+
+
+
 echo -e "[ETL] Loading and updating stops..."
 cypher-shell -a bolt+s://neo4j.aneur.info -u $username -p $password --format verbose < "_neo4j/load_stops.cypher" | 
     grep -E 'Added|Created|Set|Deleted' | awk '{print "[ETL] -- " $0}'
 
-# Insert and update parent stops for stops less then 200m apart (daisy chains)
 echo -e "[ETL] Assert that each stop has a maximum of 1 parent"
 output=$(cypher-shell -a bolt+s://neo4j.aneur.info -u $username -p $password --format verbose < "_neo4j/assert_parents.cypher" | 
     grep -E 'row' | awk '{print $1}') 
