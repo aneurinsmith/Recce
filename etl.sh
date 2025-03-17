@@ -24,7 +24,7 @@ if [ -d "$CSV_DIR/bus_data_wm" ]; then
                 break
                 ;;
             * )
-                echo -e "\033[0;33m[ETL] Invalid input, please enter y or n\033[0m"
+                echo -e "\033[33m[ETL] Invalid input, please enter y or n\033[0m"
                 ;;
         esac
     done
@@ -37,16 +37,16 @@ if [ $load_data == 'y' ]; then
     # Create csv directory
     echo -e "[ETL] -- $CSV_DIR/bus_data_wm"
     if [ -d "$CSV_DIR/bus_data_wm" ]; then
-        rm -rf "$CSV_DIR/bus_data_wm" 2>/dev/null
+        rm -rf "$CSV_DIR/bus_data_wm" 2>&1 | awk -e '{printf "\033[33m[ETL] -- %s\033[0m\n", $0}'
     fi
-    mkdir "$CSV_DIR/bus_data_wm" 2>/dev/null
+    mkdir "$CSV_DIR/bus_data_wm" 2>&1 | awk -e '{printf "\033[33m[ETL] -- %s\033[0m\n", $0}'
 
     # Create tmp directory
     echo -e "[ETL] -- $TMP_DIR/recce_etl"
     if [ -d "$TMP_DIR/recce_etl" ]; then
-        rm -rf "$TMP_DIR/recce_etl" 2>&1 | awk -e '{printf "\033[0;33m[ETL] -- [ETL] %s\033[0m\n", $0}'
+        rm -rf "$TMP_DIR/recce_etl" 2>&1 | awk -e '{printf "\033[33m[ETL] -- %s\033[0m\n", $0}'
     fi
-    mkdir "$TMP_DIR/recce_etl" 2>&1 | awk -e '{printf "\033[0;33m[ETL] -- [ETL] %s\033[0m\n", $0}'
+    mkdir "$TMP_DIR/recce_etl" 2>&1 | awk -e '{printf "\033[33m[ETL] -- %s\033[0m\n", $0}'
 
     # Download and unzip files
     echo -e "[ETL] Downloading bus_data_wm.zip..."
@@ -77,44 +77,45 @@ done
 
 echo -e "[ETL] Ensuring neo4j constraints and indexes..."
 cypher-shell -a bolt+s://neo4j.aneur.info -u $username -p $password --format verbose < "$CUR_DIR/_neo4j/create_index.cypher" | 
-    grep -E 'Added|Created|Set|Deleted' | awk '{print "[ETL] -- " $0}'
+    grep -E 'Added|Created|Set|Deleted' | awk -e '{printf "\033[90m[ETL] -- %s\033[0m\n", $0}'
 
 
 
 echo -e "[ETL] Loading and updating service dates"
 cypher-shell -a bolt+s://neo4j.aneur.info -u $username -p $password --format verbose < "$CUR_DIR/_neo4j/load_calendars.cypher" | 
-    grep -E 'Added|Created|Set|Deleted' | awk '{print "[ETL] -- " $0}'
+    grep -E 'Added|Created|Set|Deleted' | awk -e '{printf "\033[90m[ETL] -- %s\033[0m\n", $0}'
 
 echo -e "[ETL] Loading and updating agencies"
 cypher-shell -a bolt+s://neo4j.aneur.info -u $username -p $password --format verbose < "$CUR_DIR/_neo4j/load_agencies.cypher" | 
-    grep -E 'Added|Created|Set|Deleted' | awk '{print "[ETL] -- " $0}'
+    grep -E 'Added|Created|Set|Deleted' | awk -e '{printf "\033[90m[ETL] -- %s\033[0m\n", $0}'
 
 echo -e "[ETL] Loading and updating routes"
 cypher-shell -a bolt+s://neo4j.aneur.info -u $username -p $password --format verbose < "$CUR_DIR/_neo4j/load_routes.cypher" | 
-    grep -E 'Added|Created|Set|Deleted' | awk '{print "[ETL] -- " $0}'
+    grep -E 'Added|Created|Set|Deleted' | awk -e '{printf "\033[90m[ETL] -- %s\033[0m\n", $0}'
 
 echo -e "[ETL] Loading and updating trips"
 cypher-shell -a bolt+s://neo4j.aneur.info -u $username -p $password --format verbose < "$CUR_DIR/_neo4j/load_trips.cypher" | 
-    grep -E 'Added|Created|Set|Deleted' | awk '{print "[ETL] -- " $0}'
+    grep -E 'Added|Created|Set|Deleted' | awk -e '{printf "\033[90m[ETL] -- %s\033[0m\n", $0}'
 
 
 
 echo -e "[ETL] Loading and updating stops..."
 cypher-shell -a bolt+s://neo4j.aneur.info -u $username -p $password --format verbose < "$CUR_DIR/_neo4j/load_stops.cypher" | 
-    grep -E 'Added|Created|Set|Deleted' | awk '{print "[ETL] -- " $0}'
+    grep -E 'Added|Created|Set|Deleted' | awk -e '{printf "\033[90m[ETL] -- %s\033[0m\n", $0}'
 
 echo -e "[ETL] Assert that each stop has a maximum of 1 parent"
 output=$(cypher-shell -a bolt+s://neo4j.aneur.info -u $username -p $password --format verbose < "$CUR_DIR/_neo4j/assert_parents.cypher" | 
     grep -E 'row' | awk '{print $1}') 
 
 if [[ $output -gt 0 ]]; then
-    echo -e "\033[0;31m[ETL] -- Some stops loaded unsuccessfully!\033[0m"
+    echo -e "\033[31m[ETL] -- Some stops loaded unsuccessfully!\033[0m"
+    exit 1
 else
-    echo -e "[ETL] -- All stops validated successfully"
+    echo -e "\033[90m[ETL] -- All stops validated successfully.\033[0m"
 fi
 
 
 
-# echo -e "[ETL] Loading and updating stoptimes"
-# cypher-shell -a bolt+s://neo4j.aneur.info -u $username -p $password --format verbose < "$CUR_DIR/_neo4j/load_trips.cypher" | 
-#     grep -E 'Added|Created|Set|Deleted' | awk '{print "[ETL] -- " $0}'
+echo -e "[ETL] Loading and updating stoptimes"
+cypher-shell -a bolt+s://neo4j.aneur.info -u $username -p $password --format verbose < "$CUR_DIR/_neo4j/load_stoptimes.cypher" | 
+    grep -E 'Added|Created|Set|Deleted' | awk -e '{printf "\033[90m[ETL] -- %s\033[0m\n", $0}'
