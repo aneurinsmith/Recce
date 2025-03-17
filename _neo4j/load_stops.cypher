@@ -91,9 +91,11 @@ WITH s1
 MATCH (s2:Stop)
 WHERE NOT (s2)-[:CHILD_OF]-(:Stop)
   AND elementId(s1) <> elementId(s2)
-  AND substring(s1.stop_id, 0, size(s1.stop_id) -3) =
-      substring(s2.stop_id, 0, size(s2.stop_id) -3)
-  AND point.distance(s1.location, s2.location) < 100
+//   AND substring(s1.stop_id, 0, size(s1.stop_id) -3) =
+//       substring(s2.stop_id, 0, size(s2.stop_id) -3)
+  AND substring(s1.stop_id, 0, 4) =
+      substring(s2.stop_id, 0, 4)
+  AND point.distance(s1.location, s2.location) < 60
   AND apoc.text.jaroWinklerDistance(
         apoc.text.replace(s1.stop_name,'^\\d+ *?(?=[A-Za-z])| *?[Aa]lighting [Oo]nly$| *?[Aa]rrivals?$| *?\\[.*?\\]$| *?\\(.*?\\)$|(?<=[A-Za-z])[\\. ]*?\\d+$',''), 
         apoc.text.replace(s2.stop_name,'^\\d+ *?(?=[A-Za-z])| *?[Aa]lighting [Oo]nly$| *?[Aa]rrivals?$| *?\\[.*?\\]$| *?\\(.*?\\)$|(?<=[A-Za-z])[\\. ]*?\\d+$','')
@@ -110,7 +112,16 @@ WITH fs, collect(s) AS gs
 WITH DISTINCT gs
 WITH gs[0] AS fs, gs
 
-// Group all groups that have shared stops (daisy chain thrice)
+// Group all groups that have shared stops (daisy 6x)
+UNWIND gs AS s
+WITH s, collect(gs) AS gs
+WITH DISTINCT REDUCE(res = [], g IN gs | apoc.coll.union(res, g)) AS gs
+UNWIND gs AS s
+WITH s, collect(gs) AS gs
+WITH DISTINCT REDUCE(res = [], g IN gs | apoc.coll.union(res, g)) AS gs
+UNWIND gs AS s
+WITH s, collect(gs) AS gs
+WITH DISTINCT REDUCE(res = [], g IN gs | apoc.coll.union(res, g)) AS gs
 UNWIND gs AS s
 WITH s, collect(gs) AS gs
 WITH DISTINCT REDUCE(res = [], g IN gs | apoc.coll.union(res, g)) AS gs
