@@ -6,7 +6,7 @@
 LOAD CSV WITH HEADERS FROM 'file:///recce/bus_data_wm/routes.txt' AS row
 WITH collect(row.route_id) AS routeIDs
 
-// Find agencies that aren't in the dataset...
+// Find routes that aren't in the dataset...
 MATCH(r:Route)
 WHERE NOT r.route_id IN routeIDs
 
@@ -22,7 +22,7 @@ DETACH DELETE r;
 LOAD CSV WITH HEADERS FROM 'file:///recce/bus_data_wm/routes.txt' AS row
 WITH row
 
-// Create or update loaded agencies
+// Create or update loaded routes
 MERGE(r:Route {route_id: toString(row.route_id)})
 SET r.route_name = toString(row.route_short_name)
 

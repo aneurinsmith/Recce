@@ -26,4 +26,3 @@ WITH row
 MERGE(a:Agency {agency_id: toString(row.agency_id)})
 SET a.agency_name = toString(row.agency_name);
 
-
