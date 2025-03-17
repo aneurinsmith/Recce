@@ -54,6 +54,10 @@ echo -e "[ETL] Loading and updating routes"
 cypher-shell -a bolt+s://neo4j.aneur.info -u $username -p $password --format verbose < "_neo4j/load_routes.cypher" | 
     grep -E 'Added|Created|Set|Deleted' | awk '{print "[ETL] -- " $0}'
 
+echo -e "[ETL] Loading and updating trips"
+cypher-shell -a bolt+s://neo4j.aneur.info -u $username -p $password --format verbose < "_neo4j/load_trips.cypher" | 
+    grep -E 'Added|Created|Set|Deleted' | awk '{print "[ETL] -- " $0}'
+
 
 
 echo -e "[ETL] Loading and updating stops..."
