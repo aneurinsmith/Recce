@@ -46,6 +46,10 @@ cypher-shell -a bolt+s://neo4j.aneur.info -u $username -p $password --format ver
 
 
 
+echo -e "[ETL] Loading and updating service dates"
+cypher-shell -a bolt+s://neo4j.aneur.info -u $username -p $password --format verbose < "_neo4j/load_calendars.cypher" | 
+    grep -E 'Added|Created|Set|Deleted' | awk '{print "[ETL] -- " $0}'
+
 echo -e "[ETL] Loading and updating agencies"
 cypher-shell -a bolt+s://neo4j.aneur.info -u $username -p $password --format verbose < "_neo4j/load_agencies.cypher" | 
     grep -E 'Added|Created|Set|Deleted' | awk '{print "[ETL] -- " $0}'
