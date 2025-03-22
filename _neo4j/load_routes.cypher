@@ -3,7 +3,7 @@
 // Delete unused routes //
 //----------------------//
 
-LOAD CSV WITH HEADERS FROM 'file:///recce/bus_data_wm/routes.txt' AS row
+LOAD CSV WITH HEADERS FROM 'file:///recce/bus_data/routes.txt' AS row
 WITH collect(row.route_id) AS routeIDs
 
 // Find routes that aren't in the dataset...
@@ -19,7 +19,7 @@ DETACH DELETE r;
 // Create or update routes //
 //-------------------------//
 
-LOAD CSV WITH HEADERS FROM 'file:///recce/bus_data_wm/routes.txt' AS row
+LOAD CSV WITH HEADERS FROM 'file:///recce/bus_data/routes.txt' AS row
 WITH row
 
 // Create or update loaded routes

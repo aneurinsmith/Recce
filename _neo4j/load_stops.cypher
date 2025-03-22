@@ -3,7 +3,7 @@
 // Delete unused stops and parent //
 //--------------------------------//
 
-LOAD CSV WITH HEADERS FROM 'file:///recce/bus_data_wm/stops.txt' AS row
+LOAD CSV WITH HEADERS FROM 'file:///recce/bus_data/stops.txt' AS row
 WITH collect(row.stop_id) AS stopIDs
 
 // Find stops that aren't in the dataset...
@@ -14,35 +14,32 @@ WHERE NOT s.stop_id IN stopIDs
 DETACH DELETE s;
 
 
-
 //------------------------//
 // Create or update stops //
 //------------------------//
 
-LOAD CSV WITH HEADERS FROM 'file:///recce/bus_data_wm/stops.txt' AS row
+LOAD CSV WITH HEADERS FROM 'file:///recce/bus_data/stops.txt' AS row
 WITH row
 
 // Only load stops that are a platform or stop
 WHERE row.location_type IS NULL OR toInteger(row.location_type) = 0
 
-// Insert 10000 rows at a time to save memory
 CALL(row) {
     MERGE(s:Stop {stop_id: toString(row.stop_id)})
     SET s.stop_name = toString(row.stop_name),
-        s.accessible = toBoolean(row.wheelchair_boarding),
+        s.accessible = toBoolean(toInteger(row.wheelchair_boarding)),
         s.location = point({
             latitude: toFloat(row.stop_lat), 
             longitude: toFloat(row.stop_lon)
         })
-} IN TRANSACTIONS OF 10000 ROWS;
-
+} IN TRANSACTIONS OF 100000 ROWS;
 
 
 //---------------------//
 // Create parent stops //
 //---------------------//
 
-LOAD CSV WITH HEADERS FROM 'file:///recce/bus_data_wm/stops.txt' AS row
+LOAD CSV WITH HEADERS FROM 'file:///recce/bus_data/stops.txt' AS row
 WITH row
 
 // Match only stations and their child stops
@@ -68,7 +65,7 @@ WITH row, apoc.util.md5(hash) AS hash, cs
 MERGE (p:Stop {stop_id: toString(hash)})
 ON CREATE SET 
     p.stop_name = toString(row.stop_name),
-    p.accessible = toBoolean(row.wheelchair_boarding),
+    p.accessible = toBoolean(toInteger(row.wheelchair_boarding)),
     p.location = point({
         latitude: toFloat(row.stop_lat), 
         longitude: toFloat(row.stop_lon)
@@ -77,7 +74,6 @@ WITH p, cs
 UNWIND cs AS c
 MATCH (s:Stop {stop_id: c.stop_id})
 MERGE (p)<-[:CHILD_OF]-(s);
-
 
 
 //-----------------------//
@@ -148,6 +144,7 @@ WITH gs,
 MERGE (p:Stop {stop_id: toString(hash)})
 ON CREATE SET
     p.stop_name = toString(stop_name),
+    p.accessible = gs[0].accessible,
     p.location = point({
         latitude: toFloat(lat), 
         longitude: toFloat(lng)
@@ -157,3 +154,31 @@ UNWIND gs AS g
 MATCH (s:Stop {stop_id: g.stop_id})
 MERGE (p)<-[:CHILD_OF]-(s);
 
+
+//-------------------//
+// Link nearby stops //
+//-------------------//
+
+MATCH (s1:Stop)
+MATCH (s2:Stop)
+WHERE s1 <> s2 AND point.distance(s1.location, s2.location) < 1000
+
+// Only include parents, or children with no parents
+WITH s1, collect(DISTINCT s2) AS s2s
+WHERE (NOT (s1)-[:CHILD_OF]-(:Stop)) OR (:Stop)-[:CHILD_OF]->(s1)
+
+WITH s1, s2s
+UNWIND s2s AS s2
+
+// Only include parents, or children with no parents... again
+WITH s1, s2
+WHERE (NOT (s2)-[:CHILD_OF]-(:Stop)) OR (:Stop)-[:CHILD_OF]->(s2)
+
+// Only connect the 20 closest stops
+WITH s1, s2, point.distance(s1.location, s2.location) AS dist
+ORDER BY s1, dist
+WITH s1, collect(s2 {s2, dist})[..20] AS s2s
+UNWIND s2s AS s2
+
+WITH s1, s2.s2 AS s2, s2.dist AS dist
+MERGE (s1)-[:NEARBY {distWalked: dist}]-(s2)

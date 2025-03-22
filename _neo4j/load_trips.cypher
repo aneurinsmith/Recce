@@ -3,7 +3,7 @@
 // Delete unused trips //
 //---------------------//
 
-LOAD CSV WITH HEADERS FROM 'file:///recce/bus_data_wm/trips.txt' AS row
+LOAD CSV WITH HEADERS FROM 'file:///recce/bus_data/trips.txt' AS row
 WITH collect(row.trip_id) AS tripIDs
 
 // Find trips that aren't in the dataset...
@@ -19,7 +19,7 @@ DETACH DELETE t;
 // Create or update trips //
 //------------------------//
 
-LOAD CSV WITH HEADERS FROM 'file:///recce/bus_data_wm/trips.txt' AS row
+LOAD CSV WITH HEADERS FROM 'file:///recce/bus_data/trips.txt' AS row
 WITH row
 
 // Create or update loaded trips

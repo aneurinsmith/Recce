@@ -3,22 +3,30 @@
 // Delete unused calendars //
 //-------------------------//
 
-LOAD CSV WITH HEADERS FROM 'file:///recce/bus_data_wm/calendar.txt' AS row
+// Delete unused calendars
+LOAD CSV WITH HEADERS FROM 'file:///recce/bus_data/calendar.txt' AS row
 WITH collect(row.service_id) AS calendarIDs
 
-// Delete all calendars
 MATCH(c:Calendar)
 WHERE NOT c.service_id IN calendarIDs
 
 DETACH DELETE c;
 
+// Delete calendars that are wrongly connected
+LOAD CSV WITH HEADERS FROM 'file:///recce/bus_data/trips.txt' AS row
+WITH row
+
+MATCH (t:Trip {trip_id: row.trip_id})-[:RUNS_ON]->(c:Calendar)
+WHERE NOT c.service_id = row.service_id
+
+DETACH DELETE c;
 
 
 //----------------------------//
 // Create or update calendars //
 //----------------------------//
 
-LOAD CSV WITH HEADERS FROM 'file:///recce/bus_data_wm/calendar.txt' AS row
+LOAD CSV WITH HEADERS FROM 'file:///recce/bus_data/calendar.txt' AS row
 WITH row
 
 // Create or update loaded agencies
