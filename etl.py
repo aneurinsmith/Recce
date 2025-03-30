@@ -13,6 +13,7 @@ from enum import Enum
 from neo4j import GraphDatabase
 from getpass import getpass, getuser
 
+
 CSV_DIR = "/var/lib/neo4j/import/recce"
 TMP_DIR = "/tmp/recce"
 MIN_LOG_LVL = 1
@@ -120,20 +121,20 @@ class Console:
     
     def gen_str(*args: tuple):
         lvl_str = ''
-        if len(args) > 0 and type(args[0]) == Level:   
-            match args[0]:
-                case Level.TRACE:
-                    lvl_str = '\033[90m[TRACE]\033[0m\t '
-                case Level.DEBUG:
-                    lvl_str = '\033[97m[DEBUG]\033[0m\t '
-                case Level.INFO:
-                    lvl_str = '\033[97;46m [INFO]\033[0m\t '
-                case Level.WARN:
-                    lvl_str = '\033[43;30m [WARN]\033[0m\t '
-                case Level.ERROR:
-                    lvl_str = '\033[97;101m[ERROR]\033[0m\t '
-                case Level.FATAL:
-                    lvl_str = '\033[97;41m[FATAL]\033[0m\t '
+        if len(args) > 0 and type(args[0]) == Level:
+
+            if args[0] == Level.TRACE:
+                lvl_str = '\033[90m[TRACE]\033[0m\t '
+            elif args[0] == Level.DEBUG:
+                lvl_str = '\033[97m[DEBUG]\033[0m\t '
+            elif args[0] == Level.INFO:
+                lvl_str = '\033[97;46m [INFO]\033[0m\t '
+            elif args[0] == Level.WARN:
+                lvl_str = '\033[43;30m [WARN]\033[0m\t '
+            elif args[0] == Level.ERROR:
+                lvl_str = '\033[97;101m[ERROR]\033[0m\t '
+            elif args[0] == Level.FATAL:
+                lvl_str = '\033[97;41m[FATAL]\033[0m\t '
 
             args = args[1:]
 
@@ -214,18 +215,20 @@ def download_files():
         lc = 0
         while True:
             in_reload = Console.inp("Bus data already previously downloaded. Would you like to redownload it?", False, reload)
-            match in_reload:
-                case 'y' | "yes":
-                    Console.log(Level.TRACE, "Proceeding with redownloaded bus data...")
-                    reload = in_reload
-                    break
-                case 'n' | "no":
-                    Console.log(Level.TRACE, "Proceeding without redownloading bus data...")
-                    reload = in_reload
-                    break
-                case _:
-                    Console.log(Level.ERROR, f"Invalid input \"{in_reload}\". Please enter either yes or no")
-                    
+            
+            if in_reload in ['y', "yes"]:
+                Console.log(Level.TRACE, "Proceeding with redownloaded bus data...")
+                reload = in_reload
+                break
+
+            elif in_reload in ['n', "no"]:
+                Console.log(Level.TRACE, "Proceeding without redownloading bus data...")
+                reload = in_reload
+                break
+
+            else:
+                Console.log(Level.ERROR, f"Invalid input \"{in_reload}\". Please enter either yes or no")
+
             lc+=1
             if lc > 10:
                 Console.log(Level.FATAL, f"Failed too many times. Exiting script.")
@@ -262,18 +265,21 @@ def download_files():
         lc = 0
         while True:
             in_reload = Console.inp("OSM data already previously downloaded. Would you like to redownload it?", False, reload)
-            match in_reload:
-                case 'y' | "yes":
-                    Console.log(Level.TRACE, "Proceeding with redownloaded osm data...")
-                    reload = in_reload
-                    break
-                case 'n' | "no":
-                    Console.log(Level.TRACE, "Proceeding without redownloading osm data...")
-                    reload = in_reload
-                    break
-                case _:
-                    Console.log(Level.ERROR, f"Invalid input \"{in_reload}\". Please enter either yes or no")
-                    
+            
+            if in_reload in ['y', "yes"]:
+                Console.log(Level.TRACE, "Proceeding with redownloaded osm data...")
+                reload = in_reload
+                break
+
+                
+            elif in_reload in ['n', "no"]:
+                Console.log(Level.TRACE, "Proceeding without redownloading osm data...")
+                reload = in_reload
+                break
+                
+            else:
+                Console.log(Level.ERROR, f"Invalid input \"{in_reload}\". Please enter either yes or no")
+
             lc+=1
             if lc > 10:
                 Console.log(Level.FATAL, f"Failed too many times. Exiting script.")
@@ -372,7 +378,7 @@ def download_files():
 
 def execute_query(session, query: str, **kwargs):
     msg_str = "Executing cypher query"
-    if len(kwargs) > 0: msg_str += f" with params {[', '.join(f"{key}={value}" for key, value in kwargs.items())]}"
+    if len(kwargs) > 0: msg_str += " with params " + str([', '.join(f"{key}={value}" for key, value in kwargs.items())])
     Console.log(Level.TRACE, f"{msg_str}: \n", re.sub(r'^ +', '', query, flags=re.MULTILINE))
     result = session.run(query, kwargs)
     return result
