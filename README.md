@@ -1,4 +1,4 @@
-[![Website](https://img.shields.io/website?url=https%3A%2F%2Faneur.info%2Frecce)](https://aneur.info/recce)
+[![Website](https://img.shields.io/website?url=https://www.aneur.info)](https://www.aneur.info/recce)
 
 ### Create SymLinks
 
