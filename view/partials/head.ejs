@@ -1,0 +1,23 @@
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" type="image/x-icon" href="/recce/img/recce-logo.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title><%= locals.title %></title>
+
+    <% if (locals.styles && locals.styles.length > 0) { %>
+        <% locals.styles.forEach(style => { %>
+            <link rel="stylesheet" href="<%= style %>" />
+        <% }); %>
+    <% } %>
+    
+    <link rel="stylesheet" href="/recce/css/common.css" />
+    
+    <% if (locals.scripts && locals.scripts.length > 0) { %>
+        <% locals.scripts.forEach(script => { %>
+            <script src="<%= script %>"></script>
+        <% }); %>
+    <% } %>
+    
+    <script src="/recce/src/common.js"></script>
+</head>
