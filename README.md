@@ -1,4 +1,5 @@
-[![Website](https://img.shields.io/website?url=https://www.aneur.info)](https://www.aneur.info/recce)
+[![website](https://img.shields.io/website?url=https://www.aneur.info&style=flat)](https://www.aneur.info/recce)
+[![release](https://img.shields.io/github/v/release/aneurinsmith/Recce?include_prereleases&style=flat)](https://github.com/aneurinsmith/Recce/releases/latest)
 
 ### Create SymLinks
 
