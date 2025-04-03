@@ -1,8 +1,33 @@
 
 module.exports = 
 {
-    index: (req, res) => {
-        res.render('pages/index', {title: "recce."});
+    search: (req, res) => {
+        res.render('pages/search', {
+            title: "recce.",
+            styles: [
+                "https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css",
+                "https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css",
+                "/recce/css/search.css"
+            ],
+            scripts: [
+                "https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"
+            ]
+        });
+    },
+
+    result: (req, res) => {
+        res.render('pages/result', {
+            title: "recce.",
+            styles: [
+                "https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css",
+                "https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css",
+                "https://unpkg.com/maplibre-gl@^5.3.0/dist/maplibre-gl.css"
+            ],
+            scripts: [
+                "https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js",
+                "https://unpkg.com/maplibre-gl@^5.3.0/dist/maplibre-gl.js"
+            ]
+        });
     },
 
     get: async (req, res) => {
