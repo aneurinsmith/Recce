@@ -1,0 +1,54 @@
+<svg 
+    id="ePJ7pnt3Nfr1" 
+    xmlns="http://www.w3.org/2000/svg" 
+    xmlns:xlink="http://www.w3.org/1999/xlink" 
+    viewBox="0 0 32 32" 
+    width="32"
+    height="32"
+    shape-rendering="geometricPrecision" 
+    text-rendering="geometricPrecision" 
+    project-id="99868f39319c4d7eae27d96481336e30" 
+    export-id="5c3a6518805e4592969db85c87afa5b9" 
+    cached="false">
+    
+    <rect 
+        width="32" 
+        height="32" 
+        rx="6" 
+        ry="6" 
+        fill="#639" 
+        stroke-width="0"
+    />
+    <path 
+        d="
+        M 9.002886, 23.23081 
+        c 0,0, .022889, 2.75, 2.5, 2.75
+        s 2.5-2.75, 2.5-2.75
+        s 0-4.57822, 0-7
+        s 1.032257-3.499728, 2-4
+        s 2.692374-0.42329, 3.5, 0
+        s 1.356543-0.187608, 1.544439-0.542523
+        .25807-1.327771, -0.044439-1.957477
+        -0.739623-0.93805, -1.5-1.25
+        -1.702469-0.378067, -2.5-0.25
+        -1.584049, 0.550541-2.084049, 0.950541
+        -0.915951, 1.049459-0.915951, 1.049459
+        s 0-2.75, -2.5-2.75
+        -2.5, 2.75-2.5, 2.75
+        v 13 Z
+        " 
+        transform="translate(-.002886-.23081)" 
+        fill="#fff" 
+        stroke="rgba(63,87,135,0)" 
+        stroke-width="0.5"
+    />
+    
+    <ellipse 
+        rx="2.376084" 
+        ry="2.376084" 
+        transform="translate(19.82846 23.373916)" 
+        fill="#fff" 
+        stroke-width="0"
+    />
+        
+</svg>
