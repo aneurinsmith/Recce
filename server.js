@@ -28,6 +28,26 @@ app.use('/recce', express.static(path.join(__dirname, '_public')));
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'view'));
 
+app.get('/recce/api/geolocate/:ip?', async (req, res)=> {
+    var ip = req.headers['x-forwarded-for'];
+    if (req.params.ip) {
+        const _ip = req.params.ip.match(/^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/);
+        if(_ip && _ip.length > 0) {
+            ip = _ip[0];
+        }
+    }
+
+    geolocate = await fetch(`https://api.geoapify.com/v1/ipinfo?ip=${ip}&apiKey=${process.env.GEOAPIFY_KEY}`)
+        .then(res => res.json());
+
+    res.json({
+        coords: [
+            geolocate.location.latitude, 
+            geolocate.location.longitude
+        ]
+    });
+});
+
 app.get('*', handle404);
 
 app.listen(PORT, ()=> {

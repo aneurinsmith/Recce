@@ -6,9 +6,9 @@ const setLocation = async (latlng) => {
                 latlng = [position.coords.latitude, position.coords.longitude];
                 resolve();
             }, async ()=> {
-                var ipGC = await fetch('https://api.geoapify.com/v1/ipinfo?apiKey=aa97ef9528a247539cba59fcc394a411')
+                var ipGL = await fetch('/recce/api/geolocate')
                 .then(location => location.json());
-                latlng = [ipGC.location.latitude, ipGC.location.longitude];
+                latlng = ipGL.coords;
                 resolve();
             });
         });
