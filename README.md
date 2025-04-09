@@ -8,3 +8,9 @@ sudo ln -s recce.conf /etc/nginx/conf.d/
 sudo ln -s recce.service /etc/systemd/system/
 sudo systemctl start recce
 ```
+
+### Load Neo4j data
+
+```bash
+sudo python3 etl.py
+```
