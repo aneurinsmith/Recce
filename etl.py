@@ -271,7 +271,6 @@ def download_files():
                 reload = in_reload
                 break
 
-                
             elif in_reload in ['n', "no"]:
                 Console.log(Level.TRACE, "Proceeding without redownloading osm data...")
                 reload = in_reload
@@ -292,7 +291,7 @@ def download_files():
 
         try:
             Console.log(Level.DEBUG, "Downloading osm_data.osm.pbf...")
-            osm_data_url = "https://download.geofabrik.de/europe/united-kingdom/england/staffordshire-latest.osm.pbf"
+            osm_data_url = "https://download.geofabrik.de/europe/united-kingdom/england-latest.osm.pbf"
 
             wget_progress_bar = Console.gen_bar
 
@@ -369,7 +368,7 @@ def download_files():
                     key = 'historic'
                     tag = o.tags['historic']
                 
-                line = f'{o.id},"{name}",{location.x},{location.y},"{key}","{tag}",{wikidata}'
+                line = f'{o.id},{name},{location.x},{location.y},{key},{tag},{wikidata}'
                 csv.write(f"{line}\r\n")
                 Console.log(Level.TRACE, line)
 
@@ -600,6 +599,7 @@ def load_trips(session) -> QueryData:
     qd = QueryData()
     
     Console.log(Level.DEBUG, "Removing unused trips")
+
     result = execute_query(session, 
         """
         LOAD CSV WITH HEADERS FROM 'file:///recce/bus_data/trips.txt' AS trip
@@ -608,13 +608,16 @@ def load_trips(session) -> QueryData:
         MATCH (t:Trip)
         WHERE NOT t.trip_id IN trip_ids
 
-        DETACH DELETE t
+        CALL(t) {
+            DETACH DELETE t
+        } IN TRANSACTIONS OF 4000 ROWS
         """
     ).consume()
     
     qd.nodes_deleted += result.counters.nodes_deleted
     qd.relationships_deleted += result.counters.relationships_deleted
     qd.execution_time += result.result_available_after
+
 
     Console.log(Level.DEBUG, "Creating or updating trips")
     trips_file = f"{CSV_DIR}/bus_data/trips.txt"
